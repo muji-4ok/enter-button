@@ -1,7 +1,6 @@
-import keyboard
 import os
 import random
-from pathlib import Path
+
 import cfg
 
 sfx_filenames = os.listdir(cfg.SFX_DIR)
@@ -15,18 +14,16 @@ for sound in sfx_filenames:
 
 links = [
     'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    'https://www.youtube.com/watch?v=sAn7baRbhx4'
+    'https://www.youtube.com/watch?v=sAn7baRbhx4',
+    'https://moodle.phystech.edu'
 ]
 
 for link in links:
     random_actions += [cfg.open_link(link)]
     weights += [cfg.VIDEO_ACTION_WEIGHT]
 
-random_actions += [cfg.open_link('https://moodle.phystech.edu')]
-weights += [10]
-
 random_actions += [cfg.shutdown_action]
-weights += [1]
+weights += [cfg.SHUTDOWN_ACTION_WEIGHT]
 
 
 def exec_random_action():
