@@ -4,15 +4,14 @@ import random
 from pathlib import Path
 import cfg
 
-sfx_dir = Path(cfg.SFX_DIR)
-sfx_filenames = os.listdir(sfx_dir)
+sfx_filenames = os.listdir(cfg.SFX_DIR)
 
-RANDOM_ACTIONS = []
-WEIGHTS = []
+random_actions = []
+weights = []
 
 for sound in sfx_filenames:
-    RANDOM_ACTIONS += [cfg.SOUND_PLAY_FUNCTION(sound)]
-    WEIGHTS += [cfg.SOUND_ACTION_WEIGHT]
+    random_actions += [cfg.sound_play_function(str(cfg.SFX_DIR / sound))]
+    weights += [cfg.SOUND_ACTION_WEIGHT]
 
 links = [
     'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
@@ -20,18 +19,18 @@ links = [
 ]
 
 for link in links:
-    RANDOM_ACTIONS += [cfg.OPEN_LINK(link)]
-    WEIGHTS += [cfg.VIDEO_ACTION_WEIGHT]
+    random_actions += [cfg.open_link(link)]
+    weights += [cfg.VIDEO_ACTION_WEIGHT]
 
-RANDOM_ACTIONS += [cfg.OPEN_LINK('https://moodle.phystech.edu')]
-WEIGHTS += [10]
+random_actions += [cfg.open_link('https://moodle.phystech.edu')]
+weights += [10]
 
-RANDOM_ACTIONS += [cfg.SHUTDOWN]
-WEIGHTS += [1]
+random_actions += [cfg.shutdown_action]
+weights += [1]
 
 
 def exec_random_action():
-    random_action = random.choices(RANDOM_ACTIONS, weights=WEIGHTS)[0]
+    random_action = random.choices(random_actions, weights=weights)[0]
     random_action()
 
 

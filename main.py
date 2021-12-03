@@ -20,7 +20,6 @@ def main():
     env_su = os.environ.copy()
 
     while True:
-        device = None
         # find device
         devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
         for device_iterator in devices:

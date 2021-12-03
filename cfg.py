@@ -2,29 +2,30 @@
 import os
 import webbrowser
 import time
+from pathlib import Path
 
 DEVICE_NAME = 'SIGMACHIP'
 WAIT_TIME = 1
 USER_ID = 1000
 GROUP_ID = 1000
-SFX_DIR = '/home/roma/E/Windows/Users/Vasily/PycharmProjects/enter-button/sfx'
-ENV_FILE = '/home/roma/E/Windows/Users/Vasily/PycharmProjects/enter-button/env'     # created by user_env.py
+SFX_DIR = Path(__file__).parent / 'sfx'
+ENV_FILE = Path(__file__).parent / 'env'     # created by user_env.py
 SOUND_ACTION_WEIGHT = 1
 VIDEO_ACTION_WEIGHT = 3
 DEBUG = True
 
 
-def SOUND_PLAY_FUNCTION(sound):
+def sound_play_function(sound):
     def func():
         if os.getuid() == 0:
             os.setgroups([])
             os.setgid(GROUP_ID)
             os.setuid(USER_ID)
-        os.system('mpv ' + '"' + SFX_DIR + '/' + sound + '"')
+        os.system('mpv ' + '"' + sound + '"')
     return func
 
 
-def OPEN_LINK(link):
+def open_link(link):
     def func():
         if os.getuid() == 0:
             os.setgroups([])
@@ -33,11 +34,12 @@ def OPEN_LINK(link):
         webbrowser.open(link)
     return func
 
-def SHUTDOWN():
+
+def shutdown_action():
     if os.getuid() == 0:
         os.setgroups([])
         os.setgid(GROUP_ID)
         os.setuid(USER_ID)
-    os.system('mpv ' + '"' + SFX_DIR + '/' + 'Microsoft Windows XP Shutdown - Sound Effect (HD).m4a' + '"')
+    os.system('mpv ' + '"' + (Path(SFX_DIR) / 'Microsoft Windows XP Shutdown - Sound Effect (HD).m4a').absolute() + '"')
     time.sleep(3)
     os.system('shutdown now')
