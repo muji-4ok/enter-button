@@ -39,5 +39,5 @@ def SHUTDOWN():
         os.setgid(GROUP_ID)
         os.setuid(USER_ID)
     os.system('mpv ' + '"' + SFX_DIR + '/' + 'Microsoft Windows XP Shutdown - Sound Effect (HD).m4a' + '"')
-    time.sleep(4)
+    time.sleep(3)
     os.system('shutdown now')

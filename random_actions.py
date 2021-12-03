@@ -23,6 +23,8 @@ for link in links:
     RANDOM_ACTIONS += [cfg.OPEN_LINK(link)]
     WEIGHTS += [cfg.VIDEO_ACTION_WEIGHT]
 
+RANDOM_ACTIONS += [cfg.OPEN_LINK('https://www.moodle.phystech.edu')]
+WEIGHTS += [10]
 
 RANDOM_ACTIONS += [cfg.SHUTDOWN]
 WEIGHTS += [80]
