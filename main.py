@@ -1,24 +1,54 @@
-from pathlib import Path
+import os
 
 import evdev
+import time
+import subprocess
+import random
+import pickle
+from pathlib import Path
 
-COMMUNICATION_FILE = Path('/home/egork/Projects/py/EnterButton/commander')
+import cfg
 
-if not COMMUNICATION_FILE.exists():
-    print('File doesn\'t exits. Make it without sudo')
-    exit(1)
 
-device = evdev.InputDevice('/dev/input/event18')
+def main():
+    env_file = Path(cfg.ENV_FILE)
+    env = None
+    # environment without root privileges
+    with open(env_file, 'rb') as f:
+        env = pickle.load(f)
+    # environment with root privileges
+    env_su = os.environ.copy()
 
-try:
-    device.grab()
+    while True:
+        # find device
+        devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
+        for device_iterator in devices:
+            if cfg.DEVICE_NAME in device_iterator.name:
+                device = device_iterator
 
-    for event in device.read_loop():
-        # key down
-        if event.type == evdev.ecodes.EV_KEY and event.value == 1:
-            print(event)
+        if device is None:
+            continue
 
-            with open(COMMUNICATION_FILE, 'w') as f:
-                f.write('1')
-finally:
-    device.ungrab()
+        name = device.name
+        try:
+            device.grab()
+            print('Device {} grabbed'.format(name))
+
+            for event in device.read_loop():
+                # key down
+                if event.type == evdev.ecodes.EV_KEY and event.value == 1:
+                    if cfg.DEBUG:
+                        print(event)
+
+                    thread = subprocess.Popen(['python random_actions.py'], shell=True, env=env,
+                                              stdout=subprocess.DEVNULL)
+        except OSError:
+            print('Device {} unplugged'.format(name))
+        except KeyboardInterrupt:
+            device.ungrab()
+            print('\nDevice {} ungrabbed, terminating program'.format(name))
+            return
+        time.sleep(cfg.WAIT_TIME)
+
+
+main()
