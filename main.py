@@ -1,8 +1,6 @@
 import os
-import pickle
 import subprocess
 import time
-from pathlib import Path
 
 import evdev
 
@@ -10,12 +8,6 @@ import cfg
 
 
 def main():
-    env_file = Path(cfg.ENV_FILE)
-
-    # environment without root privileges
-    with open(env_file, 'rb') as f:
-        env = pickle.load(f)
-
     # environment with root privileges
     env_su = os.environ.copy()
 
@@ -44,7 +36,7 @@ def main():
                     if cfg.DEBUG:
                         print(event)
 
-                    subprocess.Popen(['python random_actions.py'], shell=True, env=env, stdout=subprocess.DEVNULL)
+                    subprocess.Popen(['python random_actions.py'], shell=True, env=env_su)
         except OSError:
             print(f'Device {name} unplugged')
         except Exception as e:

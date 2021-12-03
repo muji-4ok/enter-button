@@ -1,4 +1,6 @@
 # Config file
+import keyboard
+import pickle
 import os
 import time
 import webbrowser
@@ -28,6 +30,7 @@ def drop_privileges():
 
 def play_sound(sound_path: str):
     drop_privileges()
+    set_user_env()
 
     if USE_PLAYSOUND:
         playsound.playsound(sound_path, block=False)
@@ -39,10 +42,35 @@ def sound_play_function(sound_path: str):
     return lambda: play_sound(sound_path)
 
 
+def load_user_env() -> dict[str, str]:
+    with open(ENV_FILE, 'rb') as f:
+        data = pickle.load(f)
+
+    return data
+
+
+def set_user_env():
+    os.environ.clear()
+
+    for name, value in load_user_env().items():
+        os.environ[name] = value
+
+
 def open_link(link: str):
     def func():
-        drop_privileges()
-        webbrowser.open(link)
+        pid = os.fork()
+        assert pid >= 0
+
+        if pid == 0:
+            drop_privileges()
+            set_user_env()
+            webbrowser.open(link)
+            time.sleep(1.5)
+            exit(0)
+        else:
+            # FIXME: doesn't work
+            os.waitpid(pid, 0)
+            keyboard.write(' ')
 
     return func
 

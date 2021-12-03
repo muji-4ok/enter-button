@@ -3,7 +3,7 @@ import pickle
 import cfg
 from pathlib import Path
 
-env = os.environ.copy()
+env = dict(os.environ.copy())
 
 env_file = Path(cfg.ENV_FILE)
 
