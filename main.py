@@ -6,10 +6,11 @@ import evdev
 import cfg
 import server
 import client
+import utils
 
 
 def exec_random_action():
-    subprocess.Popen(['python random_actions.py'], shell=True)
+    subprocess.Popen(['python ' + str(utils.CUR_DIR / 'random_actions.py')], shell=True)
 
 
 def main():

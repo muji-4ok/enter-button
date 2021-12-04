@@ -6,8 +6,9 @@ import webbrowser
 from pathlib import Path
 import cfg
 import playsound
-SFX_DIR = Path(__file__).parent / 'sfx'
-ENV_FILE = Path(__file__).parent / 'env'  # created by user_env.py
+CUR_DIR = Path(__file__).parent
+SFX_DIR = CUR_DIR / 'sfx'
+ENV_FILE = CUR_DIR / 'env'  # created by user_env.py
 
 
 def drop_privileges():

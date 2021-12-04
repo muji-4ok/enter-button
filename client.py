@@ -18,7 +18,7 @@ class Client:
                 return True
             except (ConnectionRefusedError, OSError):
                 logging.debug(f'CLIENT: {server_address} unavailable')
-        logging.info('CLIENT: No servers found')
+        logging.debug('CLIENT: No servers found')
         return False
 
     def __wait_and_exec(self, func):
