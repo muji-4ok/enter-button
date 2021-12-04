@@ -2,6 +2,7 @@ import cfg
 import socket
 import threading
 import time
+import logging
 
 
 class Server:
@@ -19,8 +20,7 @@ class Server:
             try:
                 self.__cv.wait()
                 while not self.__is_shutdown:
-                    if cfg.DEBUG:
-                        print(f'Notifying')
+                    logging.debug(f'Notifying')
                     connection.sendall(bytes(1))
                     self.__cv.wait()
             except BrokenPipeError:     # client disconnected
@@ -35,8 +35,7 @@ class Server:
                 try:
                     connection, client_address = self.__socket.accept()
                     # Throws an exception if there are no pending connections
-                    if cfg.DEBUG:
-                        print(f'{client_address} connected')
+                    logging.info(f'{client_address} connected')
                     threading.Thread(target=self.__servant, args=[connection]).start()
                 except BlockingIOError as e:
                     time.sleep(cfg.CONNECTION_WAIT_PERIOD)

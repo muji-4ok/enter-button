@@ -1,6 +1,7 @@
 import socket
 import cfg
 import threading
+import logging
 
 
 class Client:
@@ -12,11 +13,11 @@ class Client:
             try:
                 server_address = (address, cfg.PORT)
                 self.__socket.connect(server_address)
-                if cfg.DEBUG:
-                    print(f'Connected to {server_address}')
+                logging.info(f'Connected to {server_address}')
                 return True
-            except ConnectionRefusedError:
+            except (ConnectionRefusedError, OSError):
                 pass
+        logging.info('No servers found')
         return False
 
     def __wait_and_exec(self, func):
@@ -25,8 +26,7 @@ class Client:
                 data = self.__socket.recv(1).decode()
                 if len(data) == 0:
                     break
-                if cfg.DEBUG:
-                    print('Command received')
+                logging.debug('Command received')
                 func()
         finally:
             self.__socket.close()

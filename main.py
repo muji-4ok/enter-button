@@ -1,7 +1,7 @@
 import time
 import random
 import threading
-
+import logging
 import evdev
 
 import cfg
@@ -15,6 +15,7 @@ def exec_random_action():
 
 
 def main():
+    logging.basicConfig(filename='run.log', encoding='utf-8', level=cfg.LEVEL, format='%(asctime)s %(message)s')
     while True:
         devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
         device = None
@@ -28,23 +29,22 @@ def main():
             serv = server.Server()
             try:
                 device.grab()
-                print(f'Device {name} grabbed')
+                logging.info(f'Device {name} grabbed')
                 serv.run()
-                print('Server started')
+                logging.info('Server started')
                 client.Client().run(exec_random_action)
-                print('Server client started')
+                logging.info('Server client started')
 
                 for event in device.read_loop():
                     # key down
                     if event.type == evdev.ecodes.EV_KEY and event.value == 1:
-                        if cfg.DEBUG:
-                            print(event)
+                        logging.debug(event)
                         serv.notify_all()
             except OSError:
-                print(f'Device {name} unplugged')
+                logging.info(f'Device {name} unplugged')
                 serv.shutdown()
             except BaseException as e:
-                print(f'Caught exception {e}')
+                logging.exception('Caught exception', exc_info=e)
                 serv.shutdown()
                 device.ungrab()
                 break
@@ -52,7 +52,7 @@ def main():
             try:
                 client.Client().run(exec_random_action)
             except KeyboardInterrupt as e:
-                print(f'Caught exception {e}')
+                logging.exception('Caught exception', exc_info=e)
                 break
 
         time.sleep(cfg.DEVICE_CONNECTION_TIMEOUT)
