@@ -15,18 +15,19 @@ class Server:
         self.__is_shutdown = False
         self.__main_thread = None
 
-    def __servant(self, connection: socket.socket):
+    def __servant(self, connection: socket.socket, client_address):
         with self.__cv:
             try:
                 self.__cv.wait()
                 while not self.__is_shutdown:
-                    logging.debug(f'Notifying')
+                    logging.debug(f'SERVER: Notifying {client_address}')
                     connection.sendall(bytes(1))
                     self.__cv.wait()
-            except BrokenPipeError:     # client disconnected
-                connection.close()
-            except BaseException:
+                logging.info(f'SERVER: {client_address} dropped')
                 connection.shutdown(socket.SHUT_RDWR)
+                connection.close()
+            except BrokenPipeError:  # client disconnected
+                logging.info(f'SERVER: {client_address} disconnected')
                 connection.close()
 
     def __running_cycle(self):
@@ -35,11 +36,12 @@ class Server:
                 try:
                     connection, client_address = self.__socket.accept()
                     # Throws an exception if there are no pending connections
-                    logging.info(f'{client_address} connected')
-                    threading.Thread(target=self.__servant, args=[connection]).start()
+                    logging.info(f'SERVER: {client_address} connected')
+                    threading.Thread(target=self.__servant, args=[connection, client_address]).start()
                 except BlockingIOError as e:
                     time.sleep(cfg.CONNECTION_WAIT_PERIOD)
         finally:
+            logging.debug('SERVER: Socket closed')
             self.__socket.close()
 
     def run(self):

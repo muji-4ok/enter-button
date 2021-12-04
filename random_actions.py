@@ -2,6 +2,7 @@ import os
 
 import cfg
 import utils
+import random
 
 sfx_filenames = os.listdir(utils.SFX_DIR)
 
@@ -25,3 +26,5 @@ for link in links:
 RANDOM_ACTIONS += [utils.shutdown_action]
 WEIGHTS += [cfg.SHUTDOWN_ACTION_WEIGHT]
 
+random_action = random.choices(RANDOM_ACTIONS, weights=WEIGHTS)[0]
+random_action()
