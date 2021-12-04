@@ -9,14 +9,15 @@ class Client:
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def __find_server(self):
+        logging.debug('Finding server')
         for address in cfg.IP_ADDRESSES:
+            server_address = (address, cfg.PORT)
             try:
-                server_address = (address, cfg.PORT)
                 self.__socket.connect(server_address)
                 logging.info(f'Connected to {server_address}')
                 return True
             except (ConnectionRefusedError, OSError):
-                pass
+                logging.debug(f'{server_address} unavailable')
         logging.info('No servers found')
         return False
 
@@ -31,9 +32,10 @@ class Client:
         finally:
             self.__socket.close()
 
-    def __run(self, func):
+    def run_here(self, func):
         if self.__find_server():
             self.__wait_and_exec(func)
 
     def run(self, func):
-        threading.Thread(target=self.__run, args=[func]).start()
+        logging.debug('Client started')
+        threading.Thread(target=self.run_here, args=[func]).start()

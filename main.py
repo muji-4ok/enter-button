@@ -50,12 +50,11 @@ def main():
                 break
         else:
             try:
-                client.Client().run(exec_random_action)
+                client.Client().run_here(exec_random_action)
+                time.sleep(cfg.DEVICE_CONNECTION_TIMEOUT)
             except KeyboardInterrupt as e:
                 logging.exception('Caught exception', exc_info=e)
                 break
-
-        time.sleep(cfg.DEVICE_CONNECTION_TIMEOUT)
 
 
 if __name__ == '__main__':
