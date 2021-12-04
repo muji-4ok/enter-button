@@ -63,6 +63,8 @@ def open_link(link: str):
                 keyboard.write(' ')
     else:
         def func():
+            drop_privileges()
+            set_user_env()
             webbrowser.open(link)
     return func
 
