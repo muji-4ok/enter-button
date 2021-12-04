@@ -1,18 +1,21 @@
-import os
-import subprocess
 import time
+import random
+import threading
 
 import evdev
 
 import cfg
+import server
+import client
+import random_actions
+
+
+def exec_random_action():
+    threading.Thread(target=random.choices(random_actions.RANDOM_ACTIONS, weights=random_actions.WEIGHTS)[0]).start()
 
 
 def main():
-    # environment with root privileges
-    env_su = os.environ.copy()
-
     while True:
-        # find device
         devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
         device = None
 
@@ -20,29 +23,39 @@ def main():
             if cfg.DEVICE_NAME in device_iterator.name:
                 device = device_iterator
 
-        if device is None:
-            time.sleep(cfg.DEVICE_CONNECTION_TIMEOUT)
-            continue
+        if device is not None:
+            name = device.name
+            serv = server.Server()
+            try:
+                device.grab()
+                print(f'Device {name} grabbed')
+                serv.run()
+                print('Server started')
+                client.Client().run(exec_random_action)
+                print('Server client started')
 
-        name = device.name
+                for event in device.read_loop():
+                    # key down
+                    if event.type == evdev.ecodes.EV_KEY and event.value == 1:
+                        if cfg.DEBUG:
+                            print(event)
+                        serv.notify_all()
+            except OSError:
+                print(f'Device {name} unplugged')
+                serv.shutdown()
+            except BaseException as e:
+                print(f'Caught exception {e}')
+                serv.shutdown()
+                device.ungrab()
+                break
+        else:
+            try:
+                client.Client().run(exec_random_action)
+            except KeyboardInterrupt as e:
+                print(f'Caught exception {e}')
+                break
 
-        try:
-            device.grab()
-            print(f'Device {name} grabbed')
-
-            for event in device.read_loop():
-                # key down
-                if event.type == evdev.ecodes.EV_KEY and event.value == 1:
-                    if cfg.DEBUG:
-                        print(event)
-
-                    subprocess.Popen(['python random_actions.py'], shell=True, env=env_su)
-        except OSError:
-            print(f'Device {name} unplugged')
-        except Exception as e:
-            print(f'Caugh exception {e}')
-            device.ungrab()
-            break
+        time.sleep(cfg.DEVICE_CONNECTION_TIMEOUT)
 
 
 if __name__ == '__main__':
