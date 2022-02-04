@@ -15,7 +15,6 @@ for sound in sfx_filenames:
 
 links = [
     'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    'https://www.youtube.com/watch?v=sAn7baRbhx4',
     'https://moodle.phystech.edu'
 ]
 
