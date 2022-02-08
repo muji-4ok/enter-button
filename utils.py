@@ -28,10 +28,6 @@ def play_sound(sound_path: str):
         os.system(f'mpv "{sound_path}"')
 
 
-def sound_play_function(sound_path: str):
-    return lambda: play_sound(sound_path)
-
-
 def load_user_env() -> dict[str, str]:
     with open(ENV_FILE, 'rb') as f:
         data = pickle.load(f)
@@ -48,26 +44,23 @@ def set_user_env():
 
 def open_link(link: str):
     if cfg.BAD_BROWSER:
-        def func():
-            pid = os.fork()
-            assert pid >= 0
+        pid = os.fork()
+        assert pid >= 0
 
-            if pid == 0:
-                drop_privileges()
-                set_user_env()
-                webbrowser.open(link)
-                time.sleep(1.5)
-                exit(0)
-            else:
-                # FixMe : doesn't work
-                os.waitpid(pid, 0)
-                keyboard.write(' ')
-    else:
-        def func():
+        if pid == 0:
             drop_privileges()
             set_user_env()
             webbrowser.open(link)
-    return func
+            time.sleep(1.5)
+            exit(0)
+        else:
+            # FixMe : doesn't work
+            os.waitpid(pid, 0)
+            keyboard.write(' ')
+    else:
+        drop_privileges()
+        set_user_env()
+        webbrowser.open(link)
 
 
 def shutdown_action():
