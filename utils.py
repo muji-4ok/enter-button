@@ -6,6 +6,7 @@ import webbrowser
 from pathlib import Path
 import cfg
 import playsound
+import random
 CUR_DIR = Path(__file__).parent
 SFX_DIR = CUR_DIR / 'sfx'
 ENV_FILE = CUR_DIR / 'env'  # created by user_env.py
@@ -68,3 +69,16 @@ def shutdown_action():
     play_sound(windows_sfx)
     time.sleep(3)
     os.system('shutdown now')
+
+
+def say_line(line):
+    drop_privileges()
+    set_user_env()
+    #os.system(f'flite -t "{line}"')
+    os.system(f'espeak-ng -g 20 -s 150 -v "en-US" "{line}"')
+
+
+def random_insult():
+    drop_privileges()
+    set_user_env()
+    say_line(random.choice(open("model/insults.txt").readlines()))

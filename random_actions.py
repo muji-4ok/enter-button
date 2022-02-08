@@ -25,11 +25,14 @@ for link in links:
 RANDOM_ACTIONS += [('shutdown', None)]
 WEIGHTS += [cfg.SHUTDOWN_ACTION_WEIGHT]
 
+RANDOM_ACTIONS += [('insult', None)]
+WEIGHTS += [800]
 
 command = {
     'play_sound': lambda x: utils.play_sound(x),
     'open_link': lambda x: utils.open_link(x),
-    'shutdown': lambda x: utils.shutdown_action()
+    'shutdown': lambda x: utils.shutdown_action(),
+    'insult': lambda x: utils.random_insult()
 }
 
 
