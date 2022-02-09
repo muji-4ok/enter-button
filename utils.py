@@ -7,6 +7,10 @@ from pathlib import Path
 import cfg
 import playsound
 import random
+import gi
+gi.require_version('Notify', '0.7')
+from gi.repository import Notify
+
 CUR_DIR = Path(__file__).parent
 SFX_DIR = CUR_DIR / 'sfx'
 ENV_FILE = CUR_DIR / 'env'  # created by user_env.py
@@ -74,8 +78,9 @@ def shutdown_action():
 def say_line(line):
     drop_privileges()
     set_user_env()
-    #os.system(f'flite -t "{line}"')
-    os.system(f'espeak-ng -g 20 -s 150 -v "en-US" "{line}"')
+    Notify.init('enter-button')
+    Notify.Notification.new(line).show()
+    Notify.uninit()
 
 
 def random_insult():
