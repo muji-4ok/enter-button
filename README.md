@@ -1,3 +1,3 @@
 # enter-button
 
-First run 'python user_env.py' to save environmental variables. Then run 'sudo python main.py'.
+First run `setup.py` to save environment variables. Then run `main.py`.

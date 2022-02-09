@@ -13,7 +13,7 @@ from gi.repository import Notify
 
 CUR_DIR = Path(__file__).parent
 SFX_DIR = CUR_DIR / 'sfx'
-ENV_FILE = CUR_DIR / 'env'  # created by user_env.py
+ENV_FILE = CUR_DIR / 'env'  # created by setup.py
 
 
 def drop_privileges():
@@ -81,6 +81,8 @@ def say_line(line):
     Notify.init('enter-button')
     Notify.Notification.new(line).show()
     Notify.uninit()
+    #line = 'test'
+    os.system(f'espeak-ng -g 5 -s 170 -v "en" "{line}"')
 
 
 def random_insult():

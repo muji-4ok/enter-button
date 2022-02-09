@@ -13,5 +13,4 @@ SHUTDOWN_ACTION_WEIGHT = 0
 LEVEL = logging.INFO
 USE_PLAYSOUND = False
 BAD_BROWSER = False
-# IP_ADDRESSES = ['192.168.0.' + str(number) for number in range(100, 110)]
-IP_ADDRESSES = ['192.168.0.103', '192.168.0.105', '192.168.0.112']
+IP_ADDRESSES = ['localhost', '192.168.0.103', '192.168.0.105', '192.168.0.112']
