@@ -7,8 +7,6 @@ from pathlib import Path
 import cfg
 import playsound
 import random
-import gi
-gi.require_version('Notify', '0.7')
 from gi.repository import Notify
 
 CUR_DIR = Path(__file__).parent
@@ -48,31 +46,16 @@ def set_user_env():
 
 
 def open_link(link: str):
-    if cfg.BAD_BROWSER:
-        pid = os.fork()
-        assert pid >= 0
-
-        if pid == 0:
-            drop_privileges()
-            set_user_env()
-            webbrowser.open(link)
-            time.sleep(1.5)
-            exit(0)
-        else:
-            # FixMe : doesn't work
-            os.waitpid(pid, 0)
-            keyboard.write(' ')
-    else:
-        drop_privileges()
-        set_user_env()
-        webbrowser.open(link)
+    drop_privileges()
+    set_user_env()
+    webbrowser.open(link)
 
 
 def shutdown_action():
     windows_sfx = str((Path(SFX_DIR) / 'Microsoft Windows XP Shutdown - Sound Effect (HD).m4a').absolute())
     play_sound(windows_sfx)
     time.sleep(3)
-    os.system('shutdown now')
+    os.system('__exit__ now')
 
 
 def say_line(line):

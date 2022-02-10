@@ -26,7 +26,7 @@ RANDOM_ACTIONS += [('shutdown', None)]
 WEIGHTS += [cfg.SHUTDOWN_ACTION_WEIGHT]
 
 RANDOM_ACTIONS += [('insult', None)]
-WEIGHTS += [800]
+WEIGHTS += [cfg.INSULT_ACTION_WEIGHT]
 
 command = {
     'play_sound': lambda x: utils.play_sound(x),

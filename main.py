@@ -2,7 +2,6 @@ import time
 import subprocess
 import logging
 import evdev
-
 import cfg
 import server
 import client
@@ -14,7 +13,15 @@ def exec_random_action():
 
 
 def main():
-    logging.basicConfig(filename='run.log', encoding='utf-8', level=cfg.LEVEL, format='%(asctime)s %(message)s')
+    log_level = {
+        'DEBUG': logging.DEBUG,
+        'INFO': logging.INFO,
+        'WARNING': logging.WARNING,
+        'ERROR': logging.ERROR,
+        'CRITICAL': logging.CRITICAL
+    }
+    logging.basicConfig(filename='run.log', filemode='w', encoding='utf-8', level=log_level[cfg.LOG_LEVEL],
+                        format='%(asctime)s %(message)s')
     while True:
         logging.debug(f'APP: Scanning devices')
         devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
@@ -27,33 +34,29 @@ def main():
         logging.debug('APP: Device search completed')
         if device is not None:
             name = device.name
-            serv = server.Server()
-            try:
-                device.grab()
-                logging.info(f'SERVER: Device {name} grabbed')
-                serv.run()
-                logging.info('SERVER: Server started')
-                client.Client().run(exec_random_action)
+            with server.Server() as serv:
+                try:
+                    device.grab()
+                    logging.info(f'SERVER: Device {name} grabbed')
+                    logging.info('SERVER: Server started')
+                    client.Client().run(exec_random_action)
 
-                for event in device.read_loop():
-                    # key down
-                    if event.type == evdev.ecodes.EV_KEY and event.value == 1:
-                        logging.debug(event)
-                        serv.notify_all()
-            except OSError:
-                logging.info(f'SERVER: Device {name} unplugged')
-                logging.info('SERVER: Shutting down')
-                serv.shutdown()
-            except KeyboardInterrupt:
-                logging.info('SERVER: Shutting down')
-                serv.shutdown()
-                device.ungrab()
-                break
-            except BaseException as e:
-                logging.exception('SERVER: Unexpected exception', exc_info=e)
-                serv.shutdown()
-                device.ungrab()
-                break
+                    for event in device.read_loop():
+                        # key down
+                        if event.type == evdev.ecodes.EV_KEY and event.value == 1:
+                            logging.debug(event)
+                            serv.notify_all()
+                except OSError:
+                    logging.info(f'SERVER: Device {name} unplugged')
+                    logging.info('SERVER: Shutting down')
+                except KeyboardInterrupt:
+                    logging.info('SERVER: Shutting down')
+                    device.ungrab()
+                    break
+                except BaseException as e:
+                    logging.exception('SERVER: Unexpected exception', exc_info=e)
+                    device.ungrab()
+                    break
 
             time.sleep(cfg.DEVICE_CONNECTION_TIMEOUT)
         else:
