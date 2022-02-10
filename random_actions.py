@@ -41,4 +41,5 @@ def random_action():
     command[action[0]](action[1])
 
 
-random_action()
+if __name__ == '__main__':
+    random_action()
